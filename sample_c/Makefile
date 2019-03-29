@@ -10,21 +10,22 @@
 TARGETS = mrubyc mrubyc_sample mrubyc_concurrent mrubyc_myclass
 CFLAGS += -g -I ../src -I ../ext -Wall -Wpointer-arith
 LDFLAGS += -L ../src
-LIBMRUBYC = ../src/libmrubyc.a 
+LIBMRUBYC = ../src/libmrubyc.a
 
 all: $(TARGETS)
 
 mrubyc: main.c $(LIBMRUBYC)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ main.c $(LIBMRUBYC)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ main.c $(LIBMRUBYC) $(EXTOPT)
 
 mrubyc_sample: main_sample.c $(LIBMRUBYC)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ main_sample.c $(LIBMRUBYC)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ main_sample.c $(LIBMRUBYC) $(EXTOPT)
 
 mrubyc_concurrent: main_concurrent.c $(LIBMRUBYC)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ main_concurrent.c $(LIBMRUBYC)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ main_concurrent.c $(LIBMRUBYC) $(EXTOPT)
 
 mrubyc_myclass: main_myclass.c $(LIBMRUBYC)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ main_myclass.c $(LIBMRUBYC)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ main_myclass.c $(LIBMRUBYC) $(EXTOPT)
 
 clean:
 	@rm -f $(TARGETS) *~
+
