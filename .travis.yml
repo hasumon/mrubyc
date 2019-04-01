@@ -1,5 +1,7 @@
 language: c
 
+compiler: gcc
+
 cache:
   directories:
     - /home/travis/.rbenv/
