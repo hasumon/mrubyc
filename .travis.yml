@@ -1,0 +1,20 @@
+language: c
+
+before_install:
+  - sudo apt update
+  - sudo apt install -y autoconf bison build-essential libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm5 libgdbm-dev
+
+before_script:
+  - git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+  - git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
+  - echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile
+  - ~/.rbenv/bin/rbenv init
+  - source ~/.bash_profile
+  - rbenv install 2.6.2
+  - rbenv install mruby-1.4.1
+  - RBENV_VERSION=2.6.2 gen install bundler:2.0.1
+  - RBENV_VERSION=2.6.2 bundle install
+
+script:
+  - RBENV_VERSION=2.6.2 bundle exec mrubyc-test
+

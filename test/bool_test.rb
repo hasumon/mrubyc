@@ -13,32 +13,41 @@ assert_true( v )
 v = false
 assert_false( v )
 
-v = nil
-assert_false( v )
-
-v = 0
-assert_true( v )
-
-v = 1
-assert_true( v )
-
-v = 0.0
-assert_true( v )
-
-v = 0.0 / 0
-assert_true( v )
-
-v = "0"
-assert_true( v )
-
-v = ""
-assert_true( v )
-
-v = []
-assert_true( v )
-
-v = :sym
-assert_true( v )
+  v = nil
+  #commented out by hasumi#assert_false( v )
+  assert_nil( v )
+  
+  v = 0
+  #commented out by hasumi#assert_true( v )
+  assert( v )
+  
+  v = 1
+  #commented out by hasumi#assert_true( v )
+  assert( v )
+  
+  v = 0.0
+  #commented out by hasumi#assert_true( v )
+  assert( v )
+  
+  v = 0.0 / 0
+  #commented out by hasumi#assert_true( v )
+  assert( v )
+  
+  v = "0"
+  #commented out by hasumi#assert_true( v )
+  assert( v )
+  
+  v = ""
+  #commented out by hasumi#assert_true( v )
+  assert( v )
+  
+  v = []
+  #commented out by hasumi#assert_true( v )
+  assert( v )
+  
+  v = :sym
+  #commented out by hasumi#assert_true( v )
+  assert( v )
 
 
 ##### !演算子 #####
@@ -101,5 +110,6 @@ assert_not_equal( v1, v2 )
 
 v1,v2 = nil,false
 assert_not_equal( v1, v2 )
+
   end
 end

@@ -64,7 +64,9 @@
 #define MRBC_USE_FLOAT 1
 
 /* USE Math class */
+#ifndef MRBC_USE_MATH
 #define MRBC_USE_MATH 0
+#endif
 
 /* USE String. Support String class */
 #define MRBC_USE_STRING 1
