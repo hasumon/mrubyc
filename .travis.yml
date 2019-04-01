@@ -9,8 +9,8 @@ before_install:
   - sudo apt install -y autoconf bison build-essential libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm3 libgdbm-dev
 
 before_script:
-  - git clone https://github.com/rbenv/rbenv.git ~/.rbenv
-  - git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
+  - if [ ! -d ~/.rbenv; ]; then git clone https://github.com/rbenv/rbenv.git ~/.rbenv; fi
+  - if [ ! -d ~/.rbenv/plugins/ruby-build; ]; then git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build; fi
   - echo 'export PATH="$HOME/.rbenv/shims:$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile
   - source ~/.bash_profile
   - rbenv init -
@@ -23,7 +23,7 @@ before_script:
   - rbenv which ruby
   - RBENV_VERSION=2.6.2 gem install bundler:2.0.1
   - RBENV_VERSION=2.6.2 bundle install
-  - if [ ! -e src/hal ]; then ln -s src/hal_posix src/hal; fi
+  - if [ ! -e src/hal ]; then ln -s hal_posix src/hal; fi
 
 script:
   - RBENV_VERSION=2.6.2 bundle exec mrubyc-test
