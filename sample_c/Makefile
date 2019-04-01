@@ -15,16 +15,16 @@ LIBMRUBYC = ../src/libmrubyc.a
 all: $(TARGETS)
 
 mrubyc: main.c $(LIBMRUBYC)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ main.c $(LIBMRUBYC) $(EXTOPT)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ main.c $(LIBMRUBYC)
 
 mrubyc_sample: main_sample.c $(LIBMRUBYC)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ main_sample.c $(LIBMRUBYC) $(EXTOPT)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ main_sample.c $(LIBMRUBYC)
 
 mrubyc_concurrent: main_concurrent.c $(LIBMRUBYC)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ main_concurrent.c $(LIBMRUBYC) $(EXTOPT)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ main_concurrent.c $(LIBMRUBYC)
 
 mrubyc_myclass: main_myclass.c $(LIBMRUBYC)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ main_myclass.c $(LIBMRUBYC) $(EXTOPT)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ main_myclass.c $(LIBMRUBYC)
 
 clean:
 	@rm -rf $(TARGETS) *.o *.dSYM *~
