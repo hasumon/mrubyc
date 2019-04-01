@@ -9,7 +9,7 @@ before_install:
   - sudo apt install -y autoconf bison build-essential libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm3 libgdbm-dev
 
 before_script:
-  - export CRUBY_VERSION=$(ruby -e'puts `grep cruby_version .mrubycconfig`.sub("cruby_version: ", "")')
+  - "export CRUBY_VERSION=$(ruby -e'puts `grep cruby_version .mrubycconfig`.sub(\"cruby_version: \", \"\")')"
   - export MRUBY_VERSION=$(grep mruby .ruby-version)
   - if [ ! -e src/hal ]; then ln -s hal_posix src/hal; fi
   - if [ ! -d ~/.rbenv; ]; then git clone https://github.com/rbenv/rbenv.git ~/.rbenv; fi
