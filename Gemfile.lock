@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/hasumikin/mrubyc-test.git
-  revision: db1c1e3ed8be086f542bbf8759f5b51e1a4ddf6f
+  revision: 7c69a16f60d822f8cc08e058ddf3e9f8328ca3e4
   specs:
     mrubyc-test (0.2.0)
       activesupport (~> 5.2)
