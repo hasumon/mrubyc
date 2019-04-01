@@ -2,7 +2,7 @@ language: c
 
 before_install:
   - sudo apt update
-  - sudo apt install -y autoconf bison build-essential libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm5 libgdbm-dev
+  - sudo apt install -y autoconf bison build-essential libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm3 libgdbm-dev
 
 before_script:
   - git clone https://github.com/rbenv/rbenv.git ~/.rbenv
