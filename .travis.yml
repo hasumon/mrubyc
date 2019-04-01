@@ -2,7 +2,7 @@ language: c
 
 cache:
   directories:
-   　- /home/travis/.rbenv/
+    - /home/travis/.rbenv/
 
 before_install:
   - sudo apt update
@@ -21,7 +21,6 @@ before_script:
   - rbenv install --skip-existing $MRUBY_VERSION
   - RBENV_VERSION=$CRUBY_VERSION gem install bundler:2.0.1
   - RBENV_VERSION=$CRUBY_VERSION bundle install
-  - if [ ! -e src/hal ]; then ln -s hal_posix src/hal; fi
 
 script:
   - RBENV_VERSION=$CRUBY_VERSION bundle exec mrubyc-test
