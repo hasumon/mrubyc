@@ -17,6 +17,9 @@ before_script:
   - rbenv versions
   - rbenv install 2.6.2
   - rbenv install mruby-1.4.1
+  - rbenv versions
+  - which ruby
+  - ruby -v
   - RBENV_VERSION=2.6.2 gem install bundler:2.0.1
   - RBENV_VERSION=2.6.2 bundle install
 
