@@ -9,18 +9,18 @@ before_install:
   - sudo apt install -y autoconf bison build-essential libssl-dev libyaml-dev libreadline6-dev zlib1g-dev libncurses5-dev libffi-dev libgdbm3 libgdbm-dev
 
 before_script:
+  - export CRUBY_VERSION=$(ruby -e'puts `grep cruby_version work/mrubyc/.mrubycconfig`.sub("cruby_vers
+ion: ", "")')
   - if [ ! -e src/hal ]; then ln -s hal_posix src/hal; fi
   - if [ ! -d ~/.rbenv; ]; then git clone https://github.com/rbenv/rbenv.git ~/.rbenv; fi
   - if [ ! -d ~/.rbenv/plugins/ruby-build; ]; then git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build; fi
   - echo 'export PATH="$HOME/.rbenv/shims:$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile
   - source ~/.bash_profile
   - rbenv init -
-  - echo $PATH
-  - rbenv versions
-  - rbenv install --skip-existing 2.6.2
+  - rbenv install --skip-existing $CRUBY_VERSION
   - rbenv install --skip-existing mruby-1.4.1
-  - RBENV_VERSION=2.6.2 gem install bundler:2.0.1
-  - RBENV_VERSION=2.6.2 bundle install
+  - RBENV_VERSION=$CRUBY_VERSION gem install bundler:2.0.1
+  - RBENV_VERSION=$CRUBY_VERSION bundle install
   - if [ ! -e src/hal ]; then ln -s hal_posix src/hal; fi
 
 script:
