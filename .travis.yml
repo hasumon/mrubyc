@@ -23,5 +23,5 @@ before_script:
   - RBENV_VERSION=$CRUBY_VERSION bundle install
 
 script:
-  - RBENV_VERSION=$CRUBY_VERSION bundle exec mrubyc-test
+  - RBENV_VERSION=2.6.2 bundle exec mrubyc-test
 
