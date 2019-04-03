@@ -2,8 +2,15 @@
 
 class MyBlockTest < MrubycTestCase
 
-  description 'block'
-  def all
-
+  def setup
+    @obj = MyBlock.new
   end
+
+  description 'basic_yield'
+  def yeald_case
+    $count = 0
+    @obj.func1 { $count += 1 }
+    assert_equal 1, $count
+  end
+
 end

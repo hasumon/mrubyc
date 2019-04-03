@@ -2,30 +2,32 @@
 
 class SymbolTest < MrubycTestCase
 
-  description 'Symbol class'
-  def all
+  description "生成"
+  def identity_case
+    s = :symbol
+    assert_equal :symbol, s
+  end
 
-# coding: utf-8
-# symbol test
+  description "比較"
+  def eq_case
+    s = :symbol
+    assert_equal true, s == :symbol
+    assert_equal false, s == :symbol2
+    assert_equal false, s != :symbol
+    assert_equal true, s != :symbol2
+  end
 
-# 生成
-s = :symbol
-assert_equal :symbol, s
+  description "to_sym"
+  def to_sym_case
+    s = "abc"
+    assert_equal :abc, s.to_sym
+    assert_not_equal :abc, s
+  end
 
-# 比較
-assert_equal true, s == :symbol
-assert_equal false, s == :symbol2
-assert_equal false, s != :symbol
-assert_equal true, s != :symbol2
-
-# to_sym
-s = "abc"
-assert_equal :abc, s.to_sym
-assert_not_equal :abc, s
-
-# to_s
-s = :symbol
-assert_equal "symbol", s.to_s
-assert_not_equal "symbol", s
+  description "to_s"
+  def to_s_case
+    s = :symbol
+    assert_equal "symbol", s.to_s
+    assert_not_equal "symbol", s
   end
 end
