@@ -42,7 +42,7 @@ void console_printf(const char *fstr, ...)
   while( 1 ) {
     ret = mrbc_printf_main( &pf );
     if( mrbc_printf_len( &pf ) ) {
-      hal_write(1, buf, mrbc_printf_len( &pf ));
+      hal_write(hal_fd, buf, mrbc_printf_len( &pf ));
       mrbc_printf_clear( &pf );
     }
     if( ret == 0 ) break;
@@ -91,7 +91,7 @@ void console_printf(const char *fstr, ...)
 	break;
       }
 
-      hal_write(1, buf, mrbc_printf_len( &pf ));
+      hal_write(hal_fd, buf, mrbc_printf_len( &pf ));
       mrbc_printf_clear( &pf );
     }
   }

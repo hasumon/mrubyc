@@ -3,6 +3,7 @@ sample_scheduler
 sample_include
 sample_concurrent
 sample_myclass
+sample_xmodem
 
 # Object files
 *.o

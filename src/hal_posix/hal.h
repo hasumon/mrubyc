@@ -50,6 +50,7 @@ void hal_disable_irq(void);
 
 #endif
 
+extern int hal_fd;
 
 /***** Inline functions *****************************************************/
 
@@ -57,13 +58,13 @@ void hal_disable_irq(void);
 /*!@brief
   Write
 
-  @param  fd    dummy, but 1.
+  @param  fd    file descriptor
   @param  buf   pointer of buffer.
   @param  nbytes        output byte length.
 */
 inline static int hal_write(int fd, const void *buf, int nbytes)
 {
-  return write(1, buf, nbytes);
+  return write(fd, buf, nbytes);
 }
 
 

@@ -2338,9 +2338,12 @@ static inline int op_stop( mrbc_vm *vm, mrbc_value *regs )
   FETCH_Z();
 
   if( vm->inst[-1] == OP_STOP ) {
-    int i;
-    for( i = 0; i < MAX_REGS_SIZE; i++ ) {
-      mrbc_release(&vm->regs[i]);
+    if( vm->flag_write_current_reg == 1 ) {
+    } else {
+      int i;
+      for( i = 0; i < MAX_REGS_SIZE; i++ ) {
+        mrbc_release(&vm->regs[i]);
+      }
     }
   }
 

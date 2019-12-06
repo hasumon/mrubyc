@@ -446,7 +446,7 @@ void * mrbc_raw_alloc(unsigned int size)
 
   // else out of memory
   static const char msg[] = "Fatal error: Out of memory.\n";
-  hal_write(1, msg, sizeof(msg)-1);
+  hal_write(hal_fd, msg, sizeof(msg)-1);
   return NULL;  // ENOMEM
 
 

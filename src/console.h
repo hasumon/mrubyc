@@ -62,7 +62,7 @@ void mrbc_printf_replace_buffer(mrbc_printf *pf, char *buf, int size);
 */
 static inline void console_putchar(char c)
 {
-  hal_write(1, &c, 1);
+  hal_write(hal_fd, &c, 1);
 }
 
 
@@ -73,7 +73,7 @@ static inline void console_putchar(char c)
 */
 static inline void console_print(const char *str)
 {
-  hal_write(1, str, strlen(str));
+  hal_write(hal_fd, str, strlen(str));
 }
 
 
@@ -85,7 +85,7 @@ static inline void console_print(const char *str)
 */
 static inline void console_nprint(const char *str, int size)
 {
-  hal_write(1, str, size);
+  hal_write(hal_fd, str, size);
 }
 
 
