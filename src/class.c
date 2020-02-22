@@ -27,6 +27,7 @@
 #include "console.h"
 #include "opcode.h"
 #include "load.h"
+#include "error.h"
 
 #include "c_array.h"
 #include "c_hash.h"
@@ -244,21 +245,19 @@ mrbc_proc *find_method(struct VM *vm, const mrbc_object *recv, mrbc_sym sym_id)
 */
 mrbc_class * mrbc_define_class(struct VM *vm, const char *name, mrbc_class *super)
 {
-  if( super == NULL ) super = mrbc_class_object;  // set default to Object.
-
   mrbc_sym sym_id = str_to_symid(name);
   mrbc_object *obj = mrbc_get_const( sym_id );
 
   // create a new class?
   if( obj == NULL ) {
-    mrbc_class *cls = mrbc_alloc( 0, sizeof(mrbc_class) );
+    mrbc_class *cls = mrbc_raw_alloc_no_free( sizeof(mrbc_class) );
     if( !cls ) return cls;	// ENOMEM
 
     cls->sym_id = sym_id;
 #ifdef MRBC_DEBUG
     cls->names = name;	// for debug; delete soon.
 #endif
-    cls->super = super;
+    cls->super = (super == NULL) ? mrbc_class_object : super;
     cls->procs = 0;
 
     // register to global constant.
@@ -469,6 +468,13 @@ int mrbc_p_sub(const mrbc_value *v)
     mrbc_print_sub(v);
     break;
   }
+
+#if 0
+  // display reference counter
+  if( v->tt >= MRBC_TT_OBJECT ) {
+    console_printf("(%d)", v->instance->ref_count);
+  }
+#endif
 
   return 0;
 }
@@ -783,6 +789,26 @@ static void c_object_new(struct VM *vm, mrbc_value v[], int argc)
 
 
 //================================================================
+/*! (method) dup
+ */
+static void c_object_dup(struct VM *vm, mrbc_value v[], int argc)
+{
+  if( v->tt == MRBC_TT_OBJECT ) {
+    mrbc_value new_obj = mrbc_instance_new(vm, v->instance->cls, 0);
+    mrbc_kv_dup( &v->instance->ivar, &new_obj.instance->ivar );
+
+    mrbc_release( v );
+    *v = new_obj;
+    return;
+  }
+
+
+  // TODO: need support TT_PROC and TT_RANGE. but really need?
+  return;
+}
+
+
+//================================================================
 /*! (method) instance variable getter
  */
 static void c_object_getiv(struct VM *vm, mrbc_value v[], int argc)
@@ -879,6 +905,36 @@ static void c_object_nil(struct VM *vm, mrbc_value v[], int argc)
 }
 
 
+
+//================================================================
+/*! (method) raise
+ *    1. raise
+ *    2. raise "string"
+ *    3. raise Exception
+ */
+static void c_object_raise(struct VM *vm, mrbc_value v[], int argc)
+{
+  // set Runtime Error
+  vm->exc = mrbc_class_runtimeerror;
+
+  // raise
+  if( argc == 0 ){    // 1. raise
+    // for test
+    int idx = --vm->exception_idx;
+    uint16_t line = vm->exceptions[idx];
+    mrbc_callinfo *callinfo = vm->exc_callinfo[idx];
+    while( vm->callinfo_tail != callinfo ){
+      mrbc_pop_callinfo(vm);
+    }
+    vm->inst = vm->pc_irep->code + line;
+  } else {
+    console_printf("Not supported\n");
+  }
+}
+
+
+
+
 #if MRBC_USE_STRING
 //================================================================
 /*! (method) to_s
@@ -922,6 +978,13 @@ static void c_object_to_s(struct VM *vm, mrbc_value v[], int argc)
 
 
 #ifdef MRBC_DEBUG
+static void c_object_object_id(struct VM *vm, mrbc_value v[], int argc)
+{
+  // tiny implementation.
+  SET_INT_RETURN( GET_INT_ARG(0) );
+}
+
+
 static void c_object_instance_methods(struct VM *vm, mrbc_value v[], int argc)
 {
   // TODO: check argument.
@@ -965,6 +1028,21 @@ static void c_object_instance_variables(struct VM *vm, mrbc_value v[], int argc)
   SET_NIL_RETURN();
 }
 
+
+static void c_object_memory_statistics(struct VM *vm, mrbc_value v[], int argc)
+{
+  int total, used, free, frag;
+  mrbc_alloc_statistics(&total, &used, &free, &frag);
+
+  console_printf("Memory Statistics\n");
+  console_printf("  Total: %d\n", total);
+  console_printf("  Used : %d\n", used);
+  console_printf("  Free : %d\n", free);
+  console_printf("  Frag.: %d\n", frag);
+
+  SET_NIL_RETURN();
+}
+
 #endif
 
 
@@ -986,11 +1064,13 @@ static void mrbc_init_class_object(struct VM *vm)
   mrbc_define_method(vm, mrbc_class_object, "===", c_object_equal3);
   mrbc_define_method(vm, mrbc_class_object, "class", c_object_class);
   mrbc_define_method(vm, mrbc_class_object, "new", c_object_new);
+  mrbc_define_method(vm, mrbc_class_object, "dup", c_object_dup);
   mrbc_define_method(vm, mrbc_class_object, "attr_reader", c_object_attr_reader);
   mrbc_define_method(vm, mrbc_class_object, "attr_accessor", c_object_attr_accessor);
   mrbc_define_method(vm, mrbc_class_object, "is_a?", c_object_kind_of);
   mrbc_define_method(vm, mrbc_class_object, "kind_of?", c_object_kind_of);
   mrbc_define_method(vm, mrbc_class_object, "nil?", c_object_nil);
+  mrbc_define_method(vm, mrbc_class_object, "raise", c_object_raise);
 
 
 #if MRBC_USE_STRING
@@ -999,8 +1079,11 @@ static void mrbc_init_class_object(struct VM *vm)
 #endif
 
 #ifdef MRBC_DEBUG
+  mrbc_define_method(vm, mrbc_class_object, "object_id", c_object_object_id);
   mrbc_define_method(vm, mrbc_class_object, "instance_methods", c_object_instance_methods);
   mrbc_define_method(vm, mrbc_class_object, "instance_variables", c_object_instance_variables);
+  mrbc_define_method(vm, mrbc_class_object, "memory_statistics", c_object_memory_statistics);
+
 #endif
 }
 
@@ -1280,6 +1363,8 @@ void mrbc_init_class(void)
   mrbc_init_class_array(0);
   mrbc_init_class_range(0);
   mrbc_init_class_hash(0);
+
+  mrbc_init_class_exception(0);
 
   mrbc_run_mrblib(mrblib_bytecode);
 }
