@@ -2403,10 +2403,16 @@ static inline int op_stop( mrbc_vm *vm, mrbc_value *regs )
   FETCH_Z();
 
   if( vm->inst[-1] == OP_STOP ) {
+#ifdef MRBC_IRB
+  if( vm->callinfo_tail != 0 ) {
+#endif
     int i;
     for( i = 0; i < MAX_REGS_SIZE; i++ ) {
       mrbc_release(&vm->regs[i]);
     }
+#ifdef MRBC_IRB
+  }
+#endif
   }
 
   vm->flag_preemption = 1;
