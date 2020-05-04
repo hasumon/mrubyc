@@ -17,7 +17,16 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include <string.h>
+#if defined(MRBC_USE_HAL_POSIX)
+#include "hal_posix/hal.h"
+#endif /* MRBC_USE_HAL_POSIX */
+#if defined(MRBC_USE_HAL_PSOC5LP)
+#include "hal_psoc5lp/hal.h"
+#endif /* MRBC_USE_HAL_PSOC5LP */
+#if !defined(MRBC_USE_HAL_POSIX) && \
+    !defined(MRBC_USE_HAL_PSOC5LP)
 #include "hal/hal.h"
+#endif /* !MRBC_USE_HAL_xxx(any) */
 #include "value.h"
 
 #ifdef __cplusplus
