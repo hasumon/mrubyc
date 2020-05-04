@@ -574,7 +574,7 @@ static void c_object_p(struct VM *vm, mrbc_value v[], int argc)
   int i;
   for( i = 1; i <= argc; i++ ) {
     mrbc_p_sub( &v[i] );
-    console_putchar('\n');
+    console_print("\r\n");
   }
 }
 
@@ -599,10 +599,10 @@ static void c_object_puts(struct VM *vm, mrbc_value v[], int argc)
   int i;
   if( argc ){
     for( i = 1; i <= argc; i++ ) {
-      if( mrbc_puts_sub( &v[i] ) == 0 ) console_putchar('\n');
+      if( mrbc_puts_sub( &v[i] ) == 0 ) console_print("\r\n");
     }
   } else {
-    console_putchar('\n');
+    console_print("\r\n");
   }
   SET_NIL_RETURN();
 }
