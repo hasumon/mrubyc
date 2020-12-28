@@ -106,6 +106,7 @@ static int load_header(struct VM *vm, const uint8_t **pos)
 */
 static mrbc_irep * load_irep_1(struct VM *vm, const uint8_t **pos)
 {
+  int recordSize = bin_to_uint32(*pos); /* hasumi monkey patch */
   const uint8_t *p = *pos + 4;			// skip record size
 
   // new irep
@@ -122,6 +123,7 @@ static mrbc_irep * load_irep_1(struct VM *vm, const uint8_t **pos)
   irep->ilen = bin_to_uint32(p);	p += 4;
 
   // padding
+  if (recordSize != -1) /* hasumi monkey patch */
   p += (vm->mrb - p) & 0x03;
 
   // allocate memory for child irep's pointers
