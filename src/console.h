@@ -32,6 +32,8 @@ extern "C" {
 
 /***** Constant values ******************************************************/
 /***** Macros ***************************************************************/
+#define mrb_p(vm, v)	mrbc_p(&v)
+
 /***** Typedefs *************************************************************/
 //================================================================
 /*! printf tiny (mruby/c) version data container.
@@ -65,10 +67,12 @@ int mrbc_printf_bstr(mrbc_printf *pf, const char *str, int len, int pad);
 int mrbc_printf_int(mrbc_printf *pf, mrbc_int value, int base);
 int mrbc_printf_bit(mrbc_printf *pf, mrbc_int value, int bit);
 int mrbc_printf_float(mrbc_printf *pf, double value);
+int mrbc_printf_pointer(mrbc_printf *pf, void *pointer);
 void mrbc_printf_replace_buffer(mrbc_printf *pf, char *buf, int size);
 int mrbc_p_sub(const mrbc_value *v);
 int mrbc_print_sub(const mrbc_value *v);
 int mrbc_puts_sub(const mrbc_value *v);
+void mrbc_p(const mrbc_value *v);
 
 
 /***** Inline functions *****************************************************/
