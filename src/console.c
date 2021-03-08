@@ -24,7 +24,6 @@
 #endif
 
 /***** Local headers ********************************************************/
-#include "alloc.h"
 #include "value.h"
 #include "class.h"
 #include "console.h"
@@ -36,6 +35,9 @@
 
 
 /***** Constant values ******************************************************/
+#define CONSOLE_PRINTF_MAX_WIDTH 82
+
+
 /***** Macros ***************************************************************/
 /***** Typedefs *************************************************************/
 /***** Function prototypes **************************************************/
@@ -108,7 +110,7 @@ void console_printf(const char *fstr, ...)
   va_start(ap, fstr);
 
   mrbc_printf pf;
-  char buf[82];
+  char buf[CONSOLE_PRINTF_MAX_WIDTH];
   mrbc_printf_init( &pf, buf, sizeof(buf), fstr );
 
   int ret;
@@ -136,7 +138,7 @@ void console_printf(const char *fstr, ...)
 	ret = mrbc_printf_int( &pf, va_arg(ap, int), 10);
 	break;
 
-      case 'D':	// for mrbc_int (see mrbc_print_sub in class.c)
+      case 'D':	// for mrbc_int (see mrbc_print_sub)
 	ret = mrbc_printf_int( &pf, va_arg(ap, mrbc_int), 10);
 	break;
 
@@ -159,6 +161,9 @@ void console_printf(const char *fstr, ...)
 	ret = mrbc_printf_float( &pf, va_arg(ap, double) );
 	break;
 #endif
+      case 'p':
+	ret = mrbc_printf_pointer( &pf, va_arg(ap, void *) );
+	break;
 
       default:
 	break;
@@ -333,6 +338,7 @@ int mrbc_printf_int( mrbc_printf *pf, mrbc_int value, int base )
 {
   int sign = 0;
   mrbc_int v = value;
+  char *pf_p_ini_val = pf->p;
 
   if( value < 0 ) {
     sign = '-';
@@ -343,56 +349,64 @@ int mrbc_printf_int( mrbc_printf *pf, mrbc_int value, int base )
     sign = ' ';
   }
 
-  if( pf->fmt.flag_minus || pf->fmt.width == 0 ) {
-    pf->fmt.flag_zero = 0; // disable zero padding if left align or width zero.
+  // disable zero padding if conflict parameters exists.
+  if( pf->fmt.flag_minus || pf->fmt.width == 0 || pf->fmt.precision != 0 ) {
+    pf->fmt.flag_zero = 0;
   }
 
-  // create string to allocated buffer
-  int alloc_size = 32+2;	// int32 + terminate + 1
-  if( alloc_size < pf->fmt.precision + 1 ) alloc_size = pf->fmt.precision + 1;
-  assert( sizeof(mrbc_int) * 8 < alloc_size );
+  // create string to temporary buffer
+  char buf[sizeof(mrbc_int) * 8];
+  char *p = buf + sizeof(buf);
 
-  char *buf = mrbc_raw_alloc( alloc_size );
-  if( buf == NULL ) return 0;	// ENOMEM
-
-  char *p = buf + alloc_size - 1;
-  *p = '\0';
   do {
-    assert( p != buf );
-    int i = v % base;
-    *--p = i + ((i < 10)? '0' : 'a' - 10);
+    int ch = v % base;
+    *--p = ch + ((ch < 10)? '0' : 'a' - 10);
     v /= base;
   } while( v != 0 );
 
-  // precision parameter
-  int precision_remain = (int)pf->fmt.precision - ((buf + alloc_size - 1) - p);
-  while( --precision_remain >= 0 ) {
-    *--p = '0';
-  }
-  pf->fmt.precision = 0;
+  int dig_width = buf + sizeof(buf) - p;
 
-  // decide pad character and output sign character
-  int ret;
-  int pad;
-  if( pf->fmt.flag_zero ) {
-    pad = '0';
-    if( sign ) {
-      *pf->p++ = sign;
-      if( pf->p >= pf->buf_end ) {
-	ret = -1;
-	goto DONE;
-      }
-      pf->fmt.width--;
+  // write padding character, if adjust right.
+  if( !pf->fmt.flag_minus && pf->fmt.width ) {
+    int pad = pf->fmt.flag_zero ? '0' : ' ';
+    int pad_width = pf->fmt.width - !!sign;
+    pad_width -= (pf->fmt.precision > dig_width)? pf->fmt.precision: dig_width;
+
+    for( ; pad_width > 0; pad_width-- ) {
+      *pf->p++ = pad;
+      if( pf->p >= pf->buf_end ) return -1;
     }
-  } else {
-    pad = ' ';
-    if( sign ) *--p = sign;
   }
-  ret = mrbc_printf_str( pf, p, pad );
 
- DONE:
-  mrbc_raw_free( buf );
-  return ret;
+  // sign
+  if( sign ) {
+    *pf->p++ = sign;
+    if( pf->p >= pf->buf_end ) return -1;
+  }
+
+  // precision
+  int pre_width = pf->fmt.precision - dig_width;
+  for( ; pre_width > 0; pre_width-- ) {
+    *pf->p++ = '0';
+    if( pf->p >= pf->buf_end ) return -1;
+  }
+
+  // digit
+  for( ; dig_width > 0; dig_width-- ) {
+    *pf->p++ = *p++;
+    if( pf->p >= pf->buf_end ) return -1;
+  }
+
+  // write space, if adjust left.
+  if( pf->fmt.flag_minus && pf->fmt.width ) {
+    int pad_width = pf->fmt.width - (pf->p - pf_p_ini_val);
+    for( ; pad_width > 0; pad_width-- ) {
+      *pf->p++ = ' ';
+      if( pf->p >= pf->buf_end ) return -1;
+    }
+  }
+
+  return 0;
 }
 
 
@@ -485,6 +499,43 @@ int mrbc_printf_float( mrbc_printf *pf, double value )
   return -(pf->p == pf->buf_end);
 }
 #endif
+
+
+
+//================================================================
+/*! sprintf subcontract function for pointer '%p'
+
+  @param  pf	pointer to mrbc_printf.
+  @param  ptr	output value.
+  @retval 0	done.
+  @retval -1	buffer full.
+
+  @note
+    display '$00000000' style only.
+    up to 8 digits, even if 64bit machines.
+    not support sign, width, precision and other parameters.
+*/
+int mrbc_printf_pointer( mrbc_printf *pf, void *ptr )
+{
+  int v = (int)ptr; // regal (void* to int), but implementation defined.
+  int n = sizeof(ptr) * 2;
+  if( n > 8 ) n = 8;
+
+  // check buffer size.
+  if( (pf->buf_end - pf->p) < n+1 ) return -1;
+
+  // write pointer value.
+  *pf->p++ = '$';
+  pf->p += n;
+  char *p = pf->p - 1;
+
+  for(; n > 0; n-- ) {
+    *p-- = (v & 0xf) < 10 ? (v & 0xf) + '0' : (v & 0xf) - 10 + 'a';
+    v >>= 4;
+  }
+
+  return 0;
+}
 
 
 
@@ -640,6 +691,10 @@ int mrbc_print_sub(const mrbc_value *v)
     console_putchar('}');
   } break;
 
+  case MRBC_TT_HANDLE:
+    console_printf( "#<Handle:%08x>", v->handle );
+    break;
+
   default:
     console_printf("Not support MRBC_TT_XX(%d)", v->tt);
     break;
@@ -669,4 +724,16 @@ int mrbc_puts_sub(const mrbc_value *v)
   }
 
   return mrbc_print_sub(v);
+}
+
+
+//================================================================
+/*! p - print mrbc_value (BETA)
+
+  @param  v	pointer to target value.
+*/
+void mrbc_p(const mrbc_value *v)
+{
+  mrbc_p_sub( v );
+  console_putchar('\n');
 }
