@@ -23,6 +23,8 @@
 #include "hal_esp32/hal.h"
 #elif defined(MRBC_USE_HAL_PIC24)
 #include "hal_pic24/hal.h"
+#elif defined(MRBC_USE_HAL_RASPI_PICO)
+#include "hal_raspi_pico/hal.h"
 #else
 #include "hal_posix/hal.h"
 #endif /* MRBC_USE_HAL_xxx */
