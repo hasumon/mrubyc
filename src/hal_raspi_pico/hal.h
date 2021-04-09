@@ -1,12 +1,10 @@
 /*! @file
   @brief
   Hardware abstraction layer
-        for PSoC5LP
-
+        for RP2040
   <pre>
-  Copyright (C) 2016 Kyushu Institute of Technology.
-  Copyright (C) 2016 Shimane IT Open-Innovation Center.
-
+  Copyright (C) 2016-2018 Kyushu Institute of Technology.
+  Copyright (C) 2016-2018 Shimane IT Open-Innovation Center.
   This file is distributed under BSD 3-Clause License.
   </pre>
 */
@@ -20,11 +18,10 @@ extern "C" {
 
 /***** Feature test switches ************************************************/
 /***** System headers *******************************************************/
-#include <pico/stdlib.h>
+#include "pico/stdlib.h"
 #include "hardware/irq.h"
 #include "hardware/clocks.h"
 #include "hardware/sync.h"
-#include "../mrubyc.h"
 
 /***** Local headers ********************************************************/
 /***** Constant values ******************************************************/
