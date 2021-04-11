@@ -19,6 +19,9 @@ endif
 ifdef MRBC_USE_HAL_PIC24
   HAL_DIR = hal_pic24
 endif
+ifdef MRBC_USE_HAL_RASPI_PICO
+  HAL_DIR = hal_user_raspi_pico
+endif
 ifdef MRBC_USE_HAL_USER_RESERVED
   HAL_DIR = hal_user_reserved
 endif
